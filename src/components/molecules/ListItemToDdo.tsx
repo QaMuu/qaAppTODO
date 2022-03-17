@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react"
+
+import { 
+  Box,
+} from "@chakra-ui/react"
+
 import { RecordToDo } from "../types/PromiseViewToDo"
 
 interface props {
@@ -39,14 +44,13 @@ const ListItemToDO = (props:props) => {
   }
 
   return (
-    <section>
+    <Box bg='tomato' w='100%' p='4' color='white' m='2' rounded='12'>
       <h3>{ (props.itemNumber + 1) + ' : ' + props.data.title }</h3>
       <h4>{ currentStatus }</h4>
-      <b>{ props.data.deadline.toDateString() }</b>
+      <b>{ props.data.deadline }</b>
       <p>{ props.data.description }</p>
       <p>{ props.data.id }</p>
-      <hr />
-    </section>
+    </Box>
   )
 }
 

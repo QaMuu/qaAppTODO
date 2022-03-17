@@ -1,8 +1,8 @@
 export type RecordToDo = {
   uuid: string,
-  id: string,
+  id: number,
   title: string,
-  deadline: Date,
+  deadline: string,
   status: number,
   description: string
 }
@@ -10,5 +10,4 @@ export type RecordToDo = {
 export type ResultCall = {
   isSuccess: boolean
   code: number
-  aryToDoRecords: Array<RecordToDo>
 }

@@ -1,33 +1,37 @@
 import React, { useState, useEffect } from 'react';
 
-import {  Button, ButtonGroup, Input } from '@chakra-ui/react';
+import { 
+  Button,
+  ButtonGroup,
+  Input
+} from '@chakra-ui/react';
 
-import { ProviderToDoList } from '../providers/ProviderToDoList'
+import {ToDoListProvider } from '../providers/ToDoListProvider'
 import { RecordToDo, ResultCall } from "../types/PromiseViewToDo";
 
 import ListItemToDO from '../molecules/ListItemToDdo';
 
 const Home = () => {
-  const listProvider:ProviderToDoList = new ProviderToDoList('uuid')
-  const [currentAryToDoList, setCurrenArrayToDoList] = useState<RecordToDo[]>([])
+  const ToDoList:ToDoListProvider = new ToDoListProvider()
+  const [currentDrawToDoList, setCurrenDrawToDoList] = useState<RecordToDo[]>([])
 
   const [ isLoading, setIsLoading ] = useState(true);
   const [ isSuccessLoad, setIsSuccessLoad ] = useState(false);
-  const [ addNewActionTitle, setAddNewActionTitle] = useState('');
+  const [ addNewToDoTitle, setAddNewToDoTitle] = useState('');
 
   useEffect(() => { initMount() },[])
 
   const initMount = () => {
-    const resultCallGet: ResultCall = listProvider.getToDoList()
+    const resultCallGet: ResultCall = ToDoList.loadingToDoList()
     if(resultCallGet.isSuccess){
-      successLoadToDoList(resultCallGet.aryToDoRecords)
+      successLoadToDoList()
     } else {
       failedLoadToDoList(resultCallGet.code)
     }
   }
 
-  const successLoadToDoList = (_catchArray:Array<RecordToDo>) =>{
-    setCurrenArrayToDoList(_catchArray)
+  const successLoadToDoList = () => {
+    setCurrenDrawToDoList(ToDoList.CurrentToDoList)
     setIsSuccessLoad(true)
     setIsLoading(false)
   }
@@ -40,28 +44,28 @@ const Home = () => {
   }
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddNewActionTitle(e.target.value);
+    setAddNewToDoTitle(e.target.value);
   };
 
   const handleOnSubmit = () => {
-    if (!addNewActionTitle) return;
+    if (!addNewToDoTitle) return;
 
-    console.log('addNewActionTitle')
-    console.log(addNewActionTitle)
+    console.log('addNewToDoTitle')
+    console.log(addNewToDoTitle)
 
-    const nextID = currentAryToDoList.length + 1
+    const nextID = ToDoList.CurrentToDoList.length + 1;
 
     const newActions: RecordToDo = {
       uuid: 'uuid',
-      id: nextID.toString(),
-      title: addNewActionTitle,
-      deadline: new Date(),
+      id: nextID,
+      title: addNewToDoTitle,
+      deadline: '',
       status: 0,
       description: ''
     }
 
-    setCurrenArrayToDoList([newActions, ...currentAryToDoList])
-    setAddNewActionTitle('');
+    setCurrenDrawToDoList([...currentDrawToDoList, newActions])
+    setAddNewToDoTitle('');
   };  
 
   return(
@@ -84,14 +88,14 @@ const Home = () => {
               handleOnSubmit();
             }}
           >
-            <input type="text" value={addNewActionTitle} onChange={(e) => handleOnChange(e)} />
-            <input type="submit" value="追加" onSubmit={handleOnSubmit} />
+            <Input type="text" value={addNewToDoTitle} onChange={(e) => handleOnChange(e)} />
+            <Button type="submit" onSubmit={handleOnSubmit}>追加</Button>
           </form>
         </div>
       }
 
       {!isLoading && isSuccessLoad &&
-        currentAryToDoList.map((element:RecordToDo, key) => 
+        currentDrawToDoList.map((element:RecordToDo, key) => 
           <ListItemToDO itemNumber={key} data={element} key={key} />
         )
       }
