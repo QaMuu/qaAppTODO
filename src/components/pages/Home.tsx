@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import { 
   Button,
@@ -6,40 +6,38 @@ import {
   Input
 } from '@chakra-ui/react';
 
-import {ToDoListProvider } from '../providers/ToDoListProvider'
+import { ToDoListContext } from '../providers/ToDoListProvider'
 import { RecordToDo, ResultCall } from "../types/PromiseViewToDo";
 
 import ListItemToDO from '../molecules/ListItemToDdo';
 
 const Home = () => {
-  const ToDoList:ToDoListProvider = new ToDoListProvider()
+  const ToDoListProvider = useContext(ToDoListContext)
   const [currentDrawToDoList, setCurrenDrawToDoList] = useState<RecordToDo[]>([])
 
   const [ isLoading, setIsLoading ] = useState(true);
   const [ isSuccessLoad, setIsSuccessLoad ] = useState(false);
   const [ addNewToDoTitle, setAddNewToDoTitle] = useState('');
 
-  useEffect(() => { initMount() },[])
+  useEffect(() => { initMount() },[currentDrawToDoList])
 
-  const initMount = () => {
-    const resultCallGet: ResultCall = ToDoList.loadingToDoList()
-    if(resultCallGet.isSuccess){
-      successLoadToDoList()
-    } else {
-      failedLoadToDoList(resultCallGet.code)
-    }
+  const initMount = async() => {
+    console.log('run initMount')
+    await ToDoListProvider.loadingToDoList()
+      .then((response:ResultCall) => {
+        console.log('response')
+        console.log(response)
+        if(response.isSuccess) {
+          successLoadToDoList()
+        }
+      })
   }
 
   const successLoadToDoList = () => {
-    setCurrenDrawToDoList(ToDoList.CurrentToDoList)
+    console.log('success loading')
+    console.log(ToDoListProvider.CurrentToDoList)
+    setCurrenDrawToDoList(ToDoListProvider.CurrentToDoList)
     setIsSuccessLoad(true)
-    setIsLoading(false)
-  }
-
-  const failedLoadToDoList = (_catchErrorCode:number) =>{
-    console.log('failed \n' + _catchErrorCode)
-    
-    setIsSuccessLoad(false)
     setIsLoading(false)
   }
 
@@ -50,12 +48,9 @@ const Home = () => {
   const handleOnSubmit = () => {
     if (!addNewToDoTitle) return;
 
-    console.log('addNewToDoTitle')
-    console.log(addNewToDoTitle)
+    const nextID = ToDoListProvider.CurrentToDoList.length + 1;
 
-    const nextID = ToDoList.CurrentToDoList.length + 1;
-
-    const newActions: RecordToDo = {
+    const newToDo: RecordToDo = {
       uuid: 'uuid',
       id: nextID,
       title: addNewToDoTitle,
@@ -64,7 +59,8 @@ const Home = () => {
       description: ''
     }
 
-    setCurrenDrawToDoList([...currentDrawToDoList, newActions])
+    ToDoListProvider.addNewToDoRecord(newToDo)
+
     setAddNewToDoTitle('');
   };  
 
