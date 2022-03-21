@@ -19,13 +19,14 @@ const Home = () => {
   const [ isSuccessLoad, setIsSuccessLoad ] = useState(false);
   const [ addNewToDoTitle, setAddNewToDoTitle] = useState('');
 
-  useEffect(() => { initMount() },[currentDrawToDoList])
+  // useEffect(() => { initMount() },[currentDrawToDoList])
+  useEffect(() => { initMount() },[])
 
   const initMount = async() => {
-    console.log('run initMount')
+    console.log('LifeCyCle-01 : run initMount')
     await ToDoListProvider.loadingToDoList()
       .then((response:ResultCall) => {
-        console.log('response')
+        console.log('LifeCycle-06 : Response Load Provider Data')
         console.log(response)
         if(response.isSuccess) {
           successLoadToDoList()
@@ -34,11 +35,13 @@ const Home = () => {
   }
 
   const successLoadToDoList = () => {
-    console.log('success loading')
+    console.log('LifeCycle-07 : success loading')
     console.log(ToDoListProvider.CurrentToDoList)
     setCurrenDrawToDoList(ToDoListProvider.CurrentToDoList)
     setIsSuccessLoad(true)
     setIsLoading(false)
+    console.log('Cycle end')
+    console.log('===========')
   }
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {

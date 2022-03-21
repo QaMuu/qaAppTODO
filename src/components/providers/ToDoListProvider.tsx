@@ -31,31 +31,46 @@ const defaultToDoListContext: typeToDoListContext = {
   updateToDoRecord: ():Promise<ResultCall> => defaultFunctionReturnResultCall()
 }
 
+const virtualTestServer = ():Promise<object> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('LifeCyCle-03 : CallBack Local Data')
+      resolve(LocalData.value);
+    }, 1000);
+  })
+}
+
 export const ToDoListContext = createContext(defaultToDoListContext)
 
 export const useToDoListProvider = (): typeToDoListContext => {
 
   const [ CurrentToDoList, setCurrentToDoList] = useState<RecordToDo[]>([])
 
-  const callBackLoadingToDoList = async():Promise<ResultCall> => {
-    return new Promise((resolve) => {
+  const callBackLoadingToDoList = ():Promise<ResultCall> => {
+    return new Promise(async(resolve) => {
       
       let callResult:ResultCall = {
         isSuccess:false,
         code:401
       }
 
-      console.log('run callBack Loading')
+      console.log("LifeCyCle-02 : run Loading Provider's ToDo List")
       
       // TODO:サーバーからデータを読み込む
-      setCurrentToDoList(LocalData.value as Array<RecordToDo>);
-      console.log('CurrentToDoList')
-      console.log(CurrentToDoList)
-      
-      callResult.isSuccess = true
-      callResult.code = 200
+      await virtualTestServer()
+        .then((response: any) =>{
 
-      resolve(callResult)
+          const tempArray: Array<RecordToDo> = response as Array<RecordToDo>
+          console.log('LifeCyCle-04 : Catch Local Data')
+          console.log(tempArray)
+
+          setCurrentToDoList(tempArray)
+          console.log('LifeCyCle-05 : setCurrentToDoList')
+          console.log(CurrentToDoList)
+          callResult.isSuccess = true
+          callResult.code = 200
+          resolve(callResult)
+        })
     })
   }
 
